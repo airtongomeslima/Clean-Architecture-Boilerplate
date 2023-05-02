@@ -10,10 +10,10 @@ namespace WebAPI.Application.Interfaces
     public interface IPessoaService
     {
         PessoaViewModel GetPessoas();
-        PessoaViewModel GetPessoaById(Guid id);
+        PessoaViewModel GetPessoaById(int id);
         void Add(PessoaViewModel pessoaViewModel);
         void Update(PessoaViewModel pessoaViewModel);
-        void Delete(Guid id);
+        void Delete(int id);
 
         
     }

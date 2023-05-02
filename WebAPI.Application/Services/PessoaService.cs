@@ -29,7 +29,7 @@ namespace WebAPI.Application.Services
             return _mapper.Map<PessoaViewModel>(pessoas);
         }
 
-        public PessoaViewModel GetPessoaById(Guid id)
+        public PessoaViewModel GetPessoaById(int id)
         {
             var pessoa = _pessoaRepository.Find(id);
             return _mapper.Map<PessoaViewModel>(pessoa);
@@ -67,7 +67,7 @@ namespace WebAPI.Application.Services
             _pessoaRepository.Update(pessoa);
         }
 
-        public void Delete(Guid id)
+        public void Delete(int id)
         {
             var pessoa = _pessoaRepository.Find(id);
             _pessoaRepository.Delete(pessoa);

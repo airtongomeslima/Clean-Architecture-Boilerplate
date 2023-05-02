@@ -23,7 +23,7 @@ namespace WebAPI.Infra.Data.Repository
             return _context.Pessoas.ToList();
         }
 
-        public Pessoa Find(Guid id)
+        public Pessoa Find(int id)
         {
             return _context.Pessoas.Find(id);
         }

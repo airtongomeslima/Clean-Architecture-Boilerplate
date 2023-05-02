@@ -23,7 +23,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet("{id}", Name = "GetPessoa")]
-        public ActionResult<PessoaViewModel> GetById(Guid id)
+        public ActionResult<PessoaViewModel> GetById(int id)
         {
             var pessoa = _pessoaService.GetPessoaById(id);
 
@@ -53,7 +53,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpDelete("{id}")]
-        public ActionResult Delete(Guid id)
+        public ActionResult Delete(int id)
         {
             _pessoaService.Delete(id);
 

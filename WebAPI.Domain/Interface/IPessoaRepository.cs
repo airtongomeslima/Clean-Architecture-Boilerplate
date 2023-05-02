@@ -10,7 +10,7 @@ namespace WebAPI.Domain.Interface
     public interface IPessoaRepository
     {
         IEnumerable<Pessoa> Get();
-        Pessoa Find(Guid id);
+        Pessoa Find(int id);
         void Add(Pessoa pessoa);
         void Update(Pessoa pessoa);
         void Delete(Pessoa pessoa);
