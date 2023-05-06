@@ -31,21 +31,35 @@ namespace WebAPI.Infra.Data.Repository
         public int Create(Pessoa entity)
         {
             var idEndereco = _enderecoRepository.Create(entity.Endereco);
-
             entity.IdEndereco = idEndereco;
 
-            var id = cnn.QuerySingleOrDefault<int>(
-                    @"INSERT INTO [Pessoa]([IdEndereco],[IdPessoaResponsavel],[Nome],[SobreNome],[Sexo],[Idade]) 
-                            VALUES(@IdEndereco,@IdPessoaResponsavel,@Nome,@SobreNome,@Sexo,@Idade);
-                ", entity);
+
+            var query = entity.IdPessoaResponsavel == 0 ?
+                @"INSERT INTO [Pessoa]([IdEndereco],[Nome],[SobreNome],[Sexo],[Idade]) 
+                    VALUES(@IdEndereco,@Nome,@SobreNome,@Sexo,@Idade);
+                    SELECT SCOPE_IDENTITY()" :
+                @"INSERT INTO [Pessoa]([IdEndereco],[IdPessoaResponsavel],[Nome],[SobreNome],[Sexo],[Idade]) 
+                    VALUES(@IdEndereco,@IdPessoaResponsavel,@Nome,@SobreNome,@Sexo,@Idade);
+                    SELECT SCOPE_IDENTITY()";
+            var id = cnn.QuerySingleOrDefault<int>(query,
+                new
+                {
+                    entity.IdEndereco,
+                    IdPessoaResponsavel = (object)entity.IdPessoaResponsavel ?? DBNull.Value,
+                    entity.Nome,
+                    entity.SobreNome,
+                    entity.Sexo,
+                    entity.Idade
+                });
 
             foreach (var telefone in entity.Telefones)
             {
-                telefone.Id = id;
+                telefone.IdPessoa = id;
                 _telefoneRepository.Create(telefone);
             }
 
             return id;
+
         }
 
         public int Create(IEnumerable<Pessoa> entities)
@@ -122,7 +136,7 @@ namespace WebAPI.Infra.Data.Repository
                 Delete(item);
             }
 
-            return toDelete.Count();            
+            return toDelete.Count();
         }
 
         public void Dispose()
@@ -140,7 +154,8 @@ namespace WebAPI.Infra.Data.Repository
             var result = cnn.Query<Pessoa>(@"SELECT [Id],[IdEndereco],[IdPessoaResponsavel],[Nome],[SobreNome],[Sexo],[Idade] FROM [Pessoa]").ToArray();
             foreach (var item in result)
             {
-                item.Telefones = _telefoneRepository.FindBy(t => t.IdPessoa == item.Id).ToList();
+                int idPessoa = item.Id;
+                item.Telefones = _telefoneRepository.FindBy(t => t.IdPessoa == idPessoa).ToList();
                 item.Endereco = _enderecoRepository.FindById(item.IdEndereco);
                 item.PessoaResponsavel = FindById(item.IdPessoaResponsavel);
             }
@@ -149,10 +164,13 @@ namespace WebAPI.Infra.Data.Repository
 
         public Pessoa[] FindBy(Expression<Func<Pessoa, bool>> predicate)
         {
-            var result = cnn.Query<Pessoa>($"SELECT [Id],[IdEndereco],[IdPessoaResponsavel],[Nome],[SobreNome],[Sexo],[Idade] FROM [Pessoa] WHERE {ConvertExpressionToSql(predicate.Body)};").ToArray();
+            var sql = $"SELECT [Id],[IdEndereco],[IdPessoaResponsavel],[Nome],[SobreNome],[Sexo],[Idade] FROM [Pessoa] WHERE {ConvertExpressionToSql(predicate.Body)}";
+            var result = cnn.Query<Pessoa>(sql, predicate.Parameters).ToArray();
+
             foreach (var item in result)
             {
-                item.Telefones = _telefoneRepository.FindBy(t => t.IdPessoa == item.Id).ToList();
+                int idPessoa = item.Id;
+                item.Telefones = _telefoneRepository.FindBy(t => t.IdPessoa == idPessoa).ToList();
                 item.Endereco = _enderecoRepository.FindById(item.IdEndereco);
                 item.PessoaResponsavel = FindById(item.IdPessoaResponsavel);
             }
@@ -161,9 +179,12 @@ namespace WebAPI.Infra.Data.Repository
 
         public Pessoa FindById(int id)
         {
-            var result = cnn.Query<Pessoa>($"SELECT [Id],[IdEndereco],[IdPessoaResponsavel],[Nome],[SobreNome],[Sexo],[Idade] FROM [Pessoa] WHERE Id equals {id};").FirstOrDefault();
+            var sql = $"SELECT [Id],[IdEndereco],[IdPessoaResponsavel],[Nome],[SobreNome],[Sexo],[Idade] FROM [Pessoa] WHERE id = @id";
+            var result = cnn.Query<Pessoa>(sql, new { id }).FirstOrDefault();
+
             if (result == null) return null;
-            result.Telefones = _telefoneRepository.FindBy(t => t.IdPessoa == result.Id).ToList();
+            int idPessoa = result.Id;
+            result.Telefones = _telefoneRepository.FindBy(t => t.IdPessoa == idPessoa).ToList();
             result.Endereco = _enderecoRepository.FindById(result.IdEndereco);
             result.PessoaResponsavel = FindById(result.IdPessoaResponsavel);
             return result;
@@ -190,7 +211,7 @@ namespace WebAPI.Infra.Data.Repository
                         WHERE
                             Id=@Id
                 ", entities);
-            
+
             foreach (var entity in entities)
             {
                 _enderecoRepository.Update(entity.Endereco);

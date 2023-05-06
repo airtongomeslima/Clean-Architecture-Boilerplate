@@ -105,8 +105,11 @@ namespace WebAPI.Infra.Data.Repository
 
         public Telefone[] FindBy(Expression<Func<Telefone, bool>> predicate)
         {
-            return cnn.Query<Telefone>($"SELECT [Id],[IdPessoa],[DDD],[Numero] FROM [Telefone] WHERE {ConvertExpressionToSql(predicate.Body)};").ToArray();
+            var sqlWhere = ConvertExpressionToSql(predicate.Body);
+            var query = $"SELECT [Id],[IdPessoa],[DDD],[Numero] FROM [Telefone] WHERE {sqlWhere};";
+            return cnn.Query<Telefone>(query).ToArray();
         }
+
 
         public Telefone FindById(int id)
         {

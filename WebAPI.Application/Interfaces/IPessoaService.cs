@@ -9,7 +9,7 @@ namespace WebAPI.Application.Interfaces
 {
     public interface IPessoaService
     {
-        PessoaViewModel GetPessoas();
+        PessoaViewModel[] GetPessoas();
         PessoaViewModel GetPessoaById(int id);
         void Add(PessoaViewModel pessoaViewModel);
         void Update(PessoaViewModel pessoaViewModel);

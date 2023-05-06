@@ -23,21 +23,21 @@ namespace WebAPI.Application.Services
             _pessoaRepository = pessoaRepository;
         }
 
-        public PessoaViewModel GetPessoas()
+        public PessoaViewModel[] GetPessoas()
         {
             var pessoas = _pessoaRepository.FindAll();
-            return _mapper.Map<PessoaViewModel>(pessoas);
+            return _mapper.Map<Pessoa[], PessoaViewModel[]>(pessoas);
         }
 
         public PessoaViewModel GetPessoaById(int id)
         {
             var pessoa = _pessoaRepository.FindById(id);
-            return _mapper.Map<PessoaViewModel>(pessoa);
+            return _mapper.Map<Pessoa, PessoaViewModel>(pessoa);
         }
 
         public void Add(PessoaViewModel pessoaViewModel)
         {
-            var pessoa = _mapper.Map<Pessoa>(pessoaViewModel);
+            var pessoa = _mapper.Map<PessoaViewModel, Pessoa>(pessoaViewModel);
             _pessoaRepository.Create(pessoa);
         }
 
@@ -63,7 +63,7 @@ namespace WebAPI.Application.Services
             pessoaExistente.Endereco = pessoaViewModel.Endereco;
             pessoaExistente.Telefones = pessoaViewModel.Telefones;
 
-            var pessoa = _mapper.Map<Pessoa>(pessoaViewModel);
+            var pessoa = _mapper.Map<PessoaViewModel, Pessoa>(pessoaViewModel);
             _pessoaRepository.Update(pessoa);
         }
 

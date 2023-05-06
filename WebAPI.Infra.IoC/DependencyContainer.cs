@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using WebAPI.Application.Interfaces;
 using WebAPI.Application.Mapper.Profiles;
@@ -8,21 +9,27 @@ using WebAPI.Infra.Data.Repository;
 
 namespace WebAPI.Infra.IoC
 {
+
     public class DependencyContainer
     {
         public static void RegisterServices(IServiceCollection services)
         {
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+            IServiceProvider provider = services.BuildServiceProvider();
+
             //AutoMapper
-            services.AddSingleton(provider =>
-            {
-                var config = new MapperConfiguration(cfg =>
+            services.AddSingleton<IMapper>(r => {
+                var mapperConfiguration = new MapperConfiguration(mc =>
                 {
-                    cfg.AddProfile<PessoaProfile>();
-                    // adicione outros perfis, se houver
+                    mc.AddProfile<PessoaProfile>();
+                    mc.AddProfile<TelefoneProfile>();
+                    mc.AddProfile<EnderecoProfile>();
                 });
 
-                return config.CreateMapper();
+                return mapperConfiguration.CreateMapper();
             });
+
 
             //Application Layer
             services.AddScoped<IPessoaService, PessoaService>();

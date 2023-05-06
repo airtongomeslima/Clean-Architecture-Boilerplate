@@ -6,6 +6,7 @@ using System.Linq.Expressions;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using static Dapper.SqlMapper;
 
 namespace WebAPI.Infra.Data.Repository
 {
@@ -25,18 +26,20 @@ namespace WebAPI.Infra.Data.Repository
 
         public int Create(Endereco entity)
         {
-            return cnn.QuerySingleOrDefault<int>(
-                    @"INSERT INTO [Endereco]([Logradouro],[Numero],[Bairro],[Cidade],[UF],[CEP]) 
-                            VALUES(@Logradouro,@Numero,@Bairro,@Cidade,@UF,@CEP);
-                ", entity);
+            var sql = @"INSERT INTO [Endereco]([Logradouro],[Numero],[Bairro],[Cidade],[UF],[CEP]) 
+            VALUES(@Logradouro,@Numero,@Bairro,@Cidade,@UF,@CEP);
+            SELECT SCOPE_IDENTITY()";
+
+            return cnn.ExecuteScalar<int>(sql, entity);
         }
 
         public int Create(IEnumerable<Endereco> entities)
         {
-            return cnn.Execute(
-                    @"INSERT INTO [Endereco]([Logradouro],[Numero],[Bairro],[Cidade],[UF],[CEP]) 
-                            VALUES(@Logradouro,@Numero,@Bairro,@Cidade,@UF,@CEP;
-                ", entities);
+            var sql = @"INSERT INTO [Endereco]([Logradouro],[Numero],[Bairro],[Cidade],[UF],[CEP]) 
+            VALUES(@Logradouro,@Numero,@Bairro,@Cidade,@UF,@CEP);
+            SELECT SCOPE_IDENTITY()";
+
+            return cnn.ExecuteScalar<int>(sql, entities);
         }
 
         public bool CreateOrUpdate(Endereco entity)
@@ -110,7 +113,7 @@ namespace WebAPI.Infra.Data.Repository
 
         public Endereco FindById(int id)
         {
-            return cnn.Query<Endereco>($"SELECT [Id],[Logradouro],[Numero],[Bairro],[Cidade],[UF],[CEP] FROM [Endereco] WHERE Id equals {id};").FirstOrDefault();
+            return cnn.Query<Endereco>(@"SELECT [Id],[Logradouro],[Numero],[Bairro],[Cidade],[UF],[CEP] FROM [Endereco] WHERE Id = @Id", new { Id = id }).FirstOrDefault();
         }
 
         public void Update(Endereco entity)

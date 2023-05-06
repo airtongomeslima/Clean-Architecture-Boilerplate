@@ -1,6 +1,7 @@
 using System;
 using System.Data.SqlClient;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
 
 namespace WebAPI.Infra.Data.Repository
@@ -29,7 +30,22 @@ namespace WebAPI.Infra.Data.Repository
             }
             else if (expression is MemberExpression memberExpression)
             {
-                builder.Append(memberExpression.Member.Name);
+                if (memberExpression.Expression != null && memberExpression.Expression.NodeType == ExpressionType.Constant)
+                {
+                    var container = ((ConstantExpression)memberExpression.Expression).Value;
+                    var value = ((FieldInfo)memberExpression.Member).GetValue(container);
+
+                    if (value == null)
+                        builder.Append("NULL");
+                    else if (value is string)
+                        builder.Append("'").Append(value).Append("'");
+                    else
+                        builder.Append(value);
+                }
+                else
+                {
+                    builder.Append(memberExpression.Member.Name);
+                }
             }
             else if (expression is ConstantExpression constantExpression)
             {
@@ -53,6 +69,7 @@ namespace WebAPI.Infra.Data.Repository
             }
             return builder.ToString();
         }
+
 
         private static string GetSqlOperator(ExpressionType type)
         {
