@@ -1,10 +1,4 @@
 ﻿using AutoMapper;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using WebAPI.Application.Interfaces;
 using WebAPI.Application.ViewModels;
 using WebAPI.Domain.Interface;
@@ -70,6 +64,10 @@ namespace WebAPI.Application.Services
         public void Delete(int id)
         {
             var pessoa = _pessoaRepository.FindById(id);
+            if(pessoa == null)
+            {
+                throw new Exception("Pessoa não encontrada");
+            }
             _pessoaRepository.Delete(pessoa);
         }
     }
