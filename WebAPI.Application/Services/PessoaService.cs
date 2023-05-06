@@ -25,20 +25,20 @@ namespace WebAPI.Application.Services
 
         public PessoaViewModel GetPessoas()
         {
-            var pessoas = _pessoaRepository.Get();
+            var pessoas = _pessoaRepository.FindAll();
             return _mapper.Map<PessoaViewModel>(pessoas);
         }
 
         public PessoaViewModel GetPessoaById(int id)
         {
-            var pessoa = _pessoaRepository.Find(id);
+            var pessoa = _pessoaRepository.FindById(id);
             return _mapper.Map<PessoaViewModel>(pessoa);
         }
 
         public void Add(PessoaViewModel pessoaViewModel)
         {
             var pessoa = _mapper.Map<Pessoa>(pessoaViewModel);
-            _pessoaRepository.Add(pessoa);
+            _pessoaRepository.Create(pessoa);
         }
 
         public void Update(PessoaViewModel pessoaViewModel)
@@ -69,7 +69,7 @@ namespace WebAPI.Application.Services
 
         public void Delete(int id)
         {
-            var pessoa = _pessoaRepository.Find(id);
+            var pessoa = _pessoaRepository.FindById(id);
             _pessoaRepository.Delete(pessoa);
         }
     }

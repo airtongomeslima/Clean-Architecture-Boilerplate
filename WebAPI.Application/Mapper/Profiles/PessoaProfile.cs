@@ -13,13 +13,16 @@ namespace WebAPI.Application.Mapper.Profiles
     {
         public PessoaProfile()
         {
-            CreateMap<Pessoa, PessoaViewModel>()
-                .ForMember(dest => dest.Endereco, opt => opt.MapFrom(src => src.Endereco))
-                .ForMember(dest => dest.Telefones, opt => opt.MapFrom(src => src.Telefones));
-
             CreateMap<PessoaViewModel, Pessoa>()
                 .ForMember(dest => dest.Endereco, opt => opt.MapFrom(src => src.Endereco))
-                .ForMember(dest => dest.Telefones, opt => opt.MapFrom(src => src.Telefones));
+                .ForMember(dest => dest.Telefones, opt => opt.MapFrom(src => src.Telefones))
+                .ForMember(dest => dest.PessoaResponsavel, opt => opt.MapFrom(src => src.PessoaResponsavel));
+
+            CreateMap<Pessoa, PessoaViewModel>()
+                .ForMember(dest => dest.Endereco, opt => opt.MapFrom(src => src.Endereco))
+                .ForMember(dest => dest.Telefones, opt => opt.MapFrom(src => src.Telefones))
+                .ForMember(dest => dest.PessoaResponsavel, opt => opt.MapFrom(src => src.PessoaResponsavel));
+
         }
     }
 }

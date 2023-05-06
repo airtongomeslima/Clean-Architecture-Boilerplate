@@ -29,6 +29,8 @@ namespace WebAPI.Infra.IoC
 
             //Data Layer
             services.AddScoped<IPessoaRepository, PessoaRepository>();
+            services.AddScoped<ITelefoneRepository, TelefoneRepository>();
+            services.AddScoped<IEnderecoRepository, EnderecoRepository>();
         }
     }
 }

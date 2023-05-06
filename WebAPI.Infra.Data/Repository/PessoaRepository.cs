@@ -1,49 +1,203 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Dapper;
 using WebAPI.Domain.Interface;
 using WebAPI.Domain.Model;
-using WebAPI.Infra.Data.Context;
+using System.Data.SqlClient;
+using System.Linq.Expressions;
+using System.Collections.Generic;
+using System.Linq;
+using System;
+using static Dapper.SqlMapper;
 
 namespace WebAPI.Infra.Data.Repository
 {
-    public class PessoaRepository : IPessoaRepository
+    public class PessoaRepository : BaseRepository, IPessoaRepository
     {
-        private readonly AppDbContext _context;
+        readonly SqlConnection cnn = DbConnection();
+        private readonly IEnderecoRepository _enderecoRepository;
+        private readonly ITelefoneRepository _telefoneRepository;
 
-        public PessoaRepository()
+        public PessoaRepository(IEnderecoRepository enderecoRepository, ITelefoneRepository telefoneRepository)
         {
-            _context = new AppDbContext();
+            cnn.Open();
+            _enderecoRepository = enderecoRepository;
+            _telefoneRepository = telefoneRepository;
         }
 
-        public IEnumerable<Pessoa> Get()
+        public int Count()
         {
-            return _context.Pessoas.ToList();
+            return cnn.Query<int>($"SELECT COUNT(1) FROM [Pessoa];").FirstOrDefault();
         }
 
-        public Pessoa Find(int id)
+        public int Create(Pessoa entity)
         {
-            return _context.Pessoas.Find(id);
+            var idEndereco = _enderecoRepository.Create(entity.Endereco);
+
+            entity.IdEndereco = idEndereco;
+
+            var id = cnn.QuerySingleOrDefault<int>(
+                    @"INSERT INTO [Pessoa]([IdEndereco],[IdPessoaResponsavel],[Nome],[SobreNome],[Sexo],[Idade]) 
+                            VALUES(@IdEndereco,@IdPessoaResponsavel,@Nome,@SobreNome,@Sexo,@Idade);
+                ", entity);
+
+            foreach (var telefone in entity.Telefones)
+            {
+                telefone.Id = id;
+                _telefoneRepository.Create(telefone);
+            }
+
+            return id;
         }
 
-        public void Add(Pessoa pessoa)
+        public int Create(IEnumerable<Pessoa> entities)
         {
-            _context.Pessoas.Add(pessoa);
-            _context.SaveChanges();
+            foreach (var entity in entities)
+            {
+                Create(entity);
+            }
+
+            return entities.Count();
         }
 
-        public void Update(Pessoa pessoa)
+        public bool CreateOrUpdate(Pessoa entity)
         {
-            _context.Pessoas.Update(pessoa);
-            _context.SaveChanges();
+            var exists = FindById(entity.Id) != null;
+            if (exists)
+            {
+                Update(entity);
+            }
+            else
+            {
+                Create(entity);
+            }
+            return !exists;
         }
 
-        public void Delete(Pessoa pessoa)
+        public int CreateOrUpdate(IEnumerable<Pessoa> entities)
         {
-            _context.Pessoas.Remove(pessoa);
-            _context.SaveChanges();
+            var affectedRows = 0;
+            foreach (var entity in entities)
+            {
+                if (CreateOrUpdate(entity))
+                {
+                    affectedRows++;
+                }
+            }
+            return affectedRows;
+        }
+
+        public void CreateTable()
+        {
+            var result = cnn.Execute(
+                @"CREATE TABLE [dbo].[Pessoa](
+	                [Id] [int] IDENTITY(1,1) False,[IdEndereco] [int]  False,[IdPessoaResponsavel] [int]  True,[Nome] [varchar]  False,[SobreNome] [varchar]  True,[Sexo] [char]  True,[Idade] [int]  True;
+                 CONSTRAINT [PK_Pessoa] PRIMARY KEY CLUSTERED 
+                (
+	                [Id] ASC
+                )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+                ) ON [PRIMARY]
+                GO");
+        }
+
+        public void Delete(Pessoa entity)
+        {
+            _enderecoRepository.Delete(entity.Endereco);
+            foreach (var telefone in entity.Telefones)
+            {
+                _telefoneRepository.Delete(telefone);
+            }
+            cnn.Execute($"DELETE FROM Pessoa WHERE Id equals {entity.Id}");
+        }
+
+        public int DeleteBy(Expression<Func<Pessoa, bool>> predicate)
+        {
+            var toDelete = FindBy(predicate);
+
+            foreach (var item in toDelete)
+            {
+                _enderecoRepository.Delete(item.Endereco);
+                foreach (var telefone in item.Telefones)
+                {
+                    _telefoneRepository.Delete(telefone);
+                }
+                Delete(item);
+            }
+
+            return toDelete.Count();            
+        }
+
+        public void Dispose()
+        {
+            cnn.Dispose();
+        }
+
+        public bool DropCollection(string collectionName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Pessoa[] FindAll()
+        {
+            var result = cnn.Query<Pessoa>(@"SELECT [Id],[IdEndereco],[IdPessoaResponsavel],[Nome],[SobreNome],[Sexo],[Idade] FROM [Pessoa]").ToArray();
+            foreach (var item in result)
+            {
+                item.Telefones = _telefoneRepository.FindBy(t => t.IdPessoa == item.Id).ToList();
+                item.Endereco = _enderecoRepository.FindById(item.IdEndereco);
+                item.PessoaResponsavel = FindById(item.IdPessoaResponsavel);
+            }
+            return result;
+        }
+
+        public Pessoa[] FindBy(Expression<Func<Pessoa, bool>> predicate)
+        {
+            var result = cnn.Query<Pessoa>($"SELECT [Id],[IdEndereco],[IdPessoaResponsavel],[Nome],[SobreNome],[Sexo],[Idade] FROM [Pessoa] WHERE {ConvertExpressionToSql(predicate.Body)};").ToArray();
+            foreach (var item in result)
+            {
+                item.Telefones = _telefoneRepository.FindBy(t => t.IdPessoa == item.Id).ToList();
+                item.Endereco = _enderecoRepository.FindById(item.IdEndereco);
+                item.PessoaResponsavel = FindById(item.IdPessoaResponsavel);
+            }
+            return result;
+        }
+
+        public Pessoa FindById(int id)
+        {
+            var result = cnn.Query<Pessoa>($"SELECT [Id],[IdEndereco],[IdPessoaResponsavel],[Nome],[SobreNome],[Sexo],[Idade] FROM [Pessoa] WHERE Id equals {id};").FirstOrDefault();
+            if (result == null) return null;
+            result.Telefones = _telefoneRepository.FindBy(t => t.IdPessoa == result.Id).ToList();
+            result.Endereco = _enderecoRepository.FindById(result.IdEndereco);
+            result.PessoaResponsavel = FindById(result.IdPessoaResponsavel);
+            return result;
+        }
+
+        public void Update(Pessoa entity)
+        {
+            cnn.Execute(
+                    @"UPDATE [Pessoa] SET
+                            @IdEndereco,@IdPessoaResponsavel,@Nome,@SobreNome,@Sexo,@Idade
+                        WHERE
+                            Id=@Id
+                ", entity);
+
+            _enderecoRepository.Update(entity.Endereco);
+            _telefoneRepository.Update(entity.Telefones);
+        }
+
+        public int Update(IEnumerable<Pessoa> entities)
+        {
+            var result = cnn.Execute(
+                    @"UPDATE [Pessoa] SET
+                            @IdEndereco,@IdPessoaResponsavel,@Nome,@SobreNome,@Sexo,@Idade
+                        WHERE
+                            Id=@Id
+                ", entities);
+            
+            foreach (var entity in entities)
+            {
+                _enderecoRepository.Update(entity.Endereco);
+                _telefoneRepository.Update(entity.Telefones);
+            }
+
+            return result;
         }
     }
 }
