@@ -31,10 +31,10 @@ namespace WebAPI.Test.MSTest.Controllers
                     new PessoaViewModel { Id = 2, Nome = "Ciclano" },
                     new PessoaViewModel { Id = 3, Nome = "Beltrano" },
                 }.ToArray();
-            _pessoaServiceMock.Setup(s => s.GetPessoas()).Returns(pessoas);
+            _pessoaServiceMock.Setup(s => s.GetPessoas(1, 3, "Id", "asc")).Returns(pessoas);
 
             // Act
-            var result = _pessoaController.Get();
+            var result = _pessoaController.Get(1, 3, "Id", "asc");
             var okResult = result.Result as OkObjectResult;
 
             // Assert

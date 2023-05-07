@@ -44,10 +44,10 @@ namespace WebAPI.Test.MSTest.Services
                     new Pessoa { Id = 2, Nome = "Ciclano" },
                     new Pessoa { Id = 3, Nome = "Beltrano" },
                 }.ToArray();
-            _pessoaRepositoryMock.Setup(r => r.FindAll()).Returns(pessoas);
+            _pessoaRepositoryMock.Setup(r => r.FindAll(1, 3, "Id", "asc")).Returns(pessoas);
 
             // Act
-            var result = _pessoaService.GetPessoas();
+            var result = _pessoaService.GetPessoas(1, 3, "Id", "asc");
 
             // Assert
             Assert.IsNotNull(result);

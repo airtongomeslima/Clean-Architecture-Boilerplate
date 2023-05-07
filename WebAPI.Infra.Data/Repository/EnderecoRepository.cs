@@ -101,9 +101,15 @@ namespace WebAPI.Infra.Data.Repository
             throw new NotImplementedException();
         }
 
-        public Endereco[] FindAll()
+        public Endereco[] FindAll(int pageNumber = 1, int pageSize = 25, string orderBy = "Id", string order = "asc")
         {
-            return cnn.Query<Endereco>(@"SELECT [Id],[Logradouro],[Numero],[Bairro],[Cidade],[UF],[CEP] FROM [Endereco]").ToArray();
+            int offset = (pageNumber - 1) * pageSize;
+            return cnn.Query<Endereco>(
+                    @$"SELECT [Id],[Logradouro],[Numero],[Bairro],[Cidade],[UF],[CEP] FROM [Endereco] 
+                        ORDER BY [{ValidateOrderBy<Endereco>(orderBy)}] {ValidateOrderByDirection(order)}
+                        OFFSET @offset ROWS FETCH NEXT @pageSize ROWS ONLY",
+                        new { offset, pageSize }
+                ).ToArray();
         }
 
         public Endereco[] FindBy(Expression<Func<Endereco, bool>> predicate)

@@ -98,9 +98,16 @@ namespace WebAPI.Infra.Data.Repository
             throw new NotImplementedException();
         }
 
-        public Telefone[] FindAll()
+        public Telefone[] FindAll(int pageNumber = 1, int pageSize = 25, string orderBy = "Id", string order = "asc")
         {
-            return cnn.Query<Telefone>(@"SELECT [Id],[IdPessoa],[DDD],[Numero] FROM [Telefone]").ToArray();
+            int offset = (pageNumber - 1) * pageSize;
+            return cnn.Query<Telefone>(
+                    $@"SELECT [Id],[IdPessoa],[DDD],[Numero] 
+                        FROM [Telefone] 
+                        ORDER BY [{ValidateOrderBy<Telefone>(orderBy)}] {ValidateOrderByDirection(order)}
+                        OFFSET @offset ROWS FETCH NEXT @pageSize ROWS ONLY",
+                    new { offset, pageSize }
+                ).ToArray();
         }
 
         public Telefone[] FindBy(Expression<Func<Telefone, bool>> predicate)

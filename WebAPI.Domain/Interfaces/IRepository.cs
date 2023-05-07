@@ -11,7 +11,7 @@ namespace WebAPI.Domain.Interface
         void Update(T entity);
         void Delete(T entity);
         T FindById(int id);
-        T[] FindAll();
+        T[] FindAll(int page = 1, int quantity = 25, string orderBy = "Id", string order = "asc");
         T[] FindBy(Expression<Func<T, bool>> predicate);
         int Count();
         int Create(IEnumerable<T> entities);

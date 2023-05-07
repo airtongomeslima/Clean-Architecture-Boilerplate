@@ -17,9 +17,9 @@ namespace WebAPI.Application.Services
             _pessoaRepository = pessoaRepository;
         }
 
-        public PessoaViewModel[] GetPessoas()
+        public PessoaViewModel[] GetPessoas(int page = 1, int quantity = 25, string orderBy = "Id", string order = "asc")
         {
-            var pessoas = _pessoaRepository.FindAll();
+            var pessoas = _pessoaRepository.FindAll(page, quantity, orderBy, order);
             return _mapper.Map<Pessoa[], PessoaViewModel[]>(pessoas);
         }
 

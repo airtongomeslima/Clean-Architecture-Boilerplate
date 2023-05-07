@@ -149,9 +149,18 @@ namespace WebAPI.Infra.Data.Repository
             throw new NotImplementedException();
         }
 
-        public Pessoa[] FindAll()
+        public Pessoa[] FindAll(int pageNumber = 1, int pageSize = 25, string orderBy = "Id", string order = "asc")
         {
-            var result = cnn.Query<Pessoa>(@"SELECT [Id],[IdEndereco],[IdPessoaResponsavel],[Nome],[SobreNome],[Sexo],[Idade] FROM [Pessoa]").ToArray();
+            int offset = (pageNumber - 1) * pageSize;
+            var result = cnn.Query<Pessoa>(
+                @$"SELECT [Id],[IdEndereco],[IdPessoaResponsavel],[Nome],[SobreNome],[Sexo],[Idade] 
+                    FROM [Pessoa] 
+                    ORDER BY [{ValidateOrderBy<Pessoa>(orderBy)}] {ValidateOrderByDirection(order)}
+                    OFFSET @offset ROWS 
+                    FETCH NEXT @pageSize ROWS ONLY",
+                new { offset, pageSize }
+            ).ToArray();
+
             foreach (var item in result)
             {
                 int idPessoa = item.Id;
@@ -159,6 +168,7 @@ namespace WebAPI.Infra.Data.Repository
                 item.Endereco = _enderecoRepository.FindById(item.IdEndereco);
                 item.PessoaResponsavel = FindById(item.IdPessoaResponsavel);
             }
+
             return result;
         }
 

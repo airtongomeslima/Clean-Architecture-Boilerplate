@@ -16,9 +16,9 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<PessoaViewModel>> Get()
+        public ActionResult<IEnumerable<PessoaViewModel>> Get(int page = 1, int quantity = 25, string orderBy = "Id", string order = "asc")
         {
-            var pessoas = _pessoaService.GetPessoas();
+            var pessoas = _pessoaService.GetPessoas(page, quantity, orderBy, order);
             return Ok(pessoas);
         }
 

@@ -70,6 +70,28 @@ namespace WebAPI.Infra.Data.Repository
             return builder.ToString();
         }
 
+        public static string ValidateOrderBy<T>(string orderBy)
+        {
+            PropertyInfo[] properties = typeof(T).GetProperties();
+            foreach (PropertyInfo property in properties)
+            {
+                if (property.Name.Equals(orderBy))
+                {
+                    return orderBy;
+                }
+            }
+
+            throw new Exception($"Invalid order by {orderBy}.");
+        }
+
+        public static string ValidateOrderByDirection(string orderByDirection)
+        {
+            if (orderByDirection.ToUpper().Equals("ASC") || orderByDirection.ToUpper().Equals("DESC"))
+            {
+                return orderByDirection.ToUpper();
+            }
+            throw new Exception($"Invalid order by direction {orderByDirection}.");
+        }
 
         private static string GetSqlOperator(ExpressionType type)
         {
