@@ -138,7 +138,7 @@ namespace WebAPI.Infra.Data.Repository
         {
             return cnn.Execute(
                     @"UPDATE [Telefone] SET
-                            @IdPessoa,@DDD,@Numero
+                            [IdPessoa]=@IdPessoa,[DDD]=@DDD,[Numero]=@Numero
                         WHERE
                             Id=@Id
                 ", entities);

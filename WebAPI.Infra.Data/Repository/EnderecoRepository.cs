@@ -127,7 +127,7 @@ namespace WebAPI.Infra.Data.Repository
         {
             cnn.Execute(
                     @"UPDATE [Endereco] SET
-                            @Logradouro,@Numero,@Bairro,@Cidade,@UF,@CEP
+                            [Logradouro]=@Logradouro,[Numero]=@Numero,[Bairro]=@Bairro,[Cidade]=@Cidade,[UF]=@UF,[CEP]=@CEP
                         WHERE
                             Id=@Id
                 ", entity);
@@ -137,7 +137,7 @@ namespace WebAPI.Infra.Data.Repository
         {
             return cnn.Execute(
                     @"UPDATE [Endereco] SET
-                            @Logradouro,@Numero,@Bairro,@Cidade,@UF,@CEP
+                            [Logradouro]=@Logradouro,[Numero]=@Numero,[Bairro]=@Bairro,[Cidade]=@Cidade,[UF]=@UF,[CEP]=@CEP
                         WHERE
                             Id=@Id
                 ", entities);

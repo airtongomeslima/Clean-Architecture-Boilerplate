@@ -206,10 +206,19 @@ namespace WebAPI.Infra.Data.Repository
         public void Update(Pessoa entity)
         {
             cnn.Execute(
-                    @"UPDATE [Pessoa] SET
-                            @IdEndereco,@IdPessoaResponsavel,@Nome,@SobreNome,@Sexo,@Idade
-                        WHERE
-                            Id=@Id
+                    @$"UPDATE [Pessoa] 
+                        SET 
+                            [IdEndereco]=@IdEndereco,
+                            [IdPessoaResponsavel] = CASE 
+                                                        WHEN @IdPessoaResponsavel = 0 
+                                                            THEN NULL 
+                                                        ELSE @IdPessoaResponsavel 
+                                                    END,
+                            [Nome]=@Nome,
+                            [SobreNome]=@SobreNome,
+                            [Sexo]=@Sexo,
+                            [Idade]=@Idade
+                        WHERE Id=@Id
                 ", entity);
 
             _enderecoRepository.Update(entity.Endereco);
@@ -219,10 +228,19 @@ namespace WebAPI.Infra.Data.Repository
         public int Update(IEnumerable<Pessoa> entities)
         {
             var result = cnn.Execute(
-                    @"UPDATE [Pessoa] SET
-                            @IdEndereco,@IdPessoaResponsavel,@Nome,@SobreNome,@Sexo,@Idade
-                        WHERE
-                            Id=@Id
+                    @"UPDATE [Pessoa] 
+                        SET 
+                            [IdEndereco]=@IdEndereco,
+                            [IdPessoaResponsavel] = CASE 
+                                                        WHEN @IdPessoaResponsavel = 0 
+                                                            THEN NULL 
+                                                        ELSE @IdPessoaResponsavel 
+                                                    END,
+                            [Nome]=@Nome,
+                            [SobreNome]=@SobreNome,
+                            [Sexo]=@Sexo,
+                            [Idade]=@Idade
+                        WHERE Id=@Id
                 ", entities);
 
             foreach (var entity in entities)
