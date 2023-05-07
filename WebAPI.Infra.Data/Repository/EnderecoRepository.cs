@@ -83,7 +83,8 @@ namespace WebAPI.Infra.Data.Repository
 
         public void Delete(Endereco entity)
         {
-            cnn.Execute($"DELETE FROM Endereco WHERE Id equals {entity.Id}");
+            if(FindById(entity.Id) != null)
+                cnn.Execute($"DELETE FROM Endereco WHERE Id = @id", new { id = entity.Id });
         }
 
         public int DeleteBy(Expression<Func<Endereco, bool>> predicate)

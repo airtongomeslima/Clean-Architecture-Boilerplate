@@ -80,7 +80,8 @@ namespace WebAPI.Infra.Data.Repository
 
         public void Delete(Telefone entity)
         {
-            cnn.Execute($"DELETE FROM Telefone WHERE Id equals {entity.Id}");
+            if(FindById(entity.Id) != null)
+                cnn.Execute($"DELETE FROM Telefone WHERE Id = {entity.Id}");
         }
 
         public int DeleteBy(Expression<Func<Telefone, bool>> predicate)

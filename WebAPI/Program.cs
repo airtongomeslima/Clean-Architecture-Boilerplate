@@ -16,8 +16,8 @@ builder.Services.AddCors(options =>
         .AllowAnyOrigin()
         .AllowAnyMethod()
         .AllowAnyHeader()
-        .WithExposedHeaders("Content-Disposition") // Permite o cabeçalho 'Content-Disposition' para download de arquivos
-        .WithHeaders("Content-Type")); // Permite o cabeçalho 'Content-Type'
+        .WithExposedHeaders("Content-Disposition")
+        .WithHeaders("Content-Type"));
 });
 
 DependencyContainer.RegisterServices(builder.Services);

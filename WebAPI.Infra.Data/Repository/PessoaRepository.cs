@@ -114,12 +114,15 @@ namespace WebAPI.Infra.Data.Repository
 
         public void Delete(Pessoa entity)
         {
-            _enderecoRepository.Delete(entity.Endereco);
-            foreach (var telefone in entity.Telefones)
+            if (FindById(entity.Id) != null)
             {
-                _telefoneRepository.Delete(telefone);
+                foreach (var telefone in entity.Telefones)
+                {
+                    _telefoneRepository.Delete(telefone);
+                }
+                cnn.Execute($"DELETE FROM Pessoa WHERE Id = @id", new { id = entity.Id });
+                _enderecoRepository.Delete(entity.Endereco);
             }
-            cnn.Execute($"DELETE FROM Pessoa WHERE Id equals {entity.Id}");
         }
 
         public int DeleteBy(Expression<Func<Pessoa, bool>> predicate)
