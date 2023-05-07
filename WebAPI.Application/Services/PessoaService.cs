@@ -29,6 +29,11 @@ namespace WebAPI.Application.Services
             return _mapper.Map<Pessoa, PessoaViewModel>(pessoa);
         }
 
+        public int Count()
+        {
+            return _pessoaRepository.Count();
+        }
+
         public void Add(PessoaViewModel pessoaViewModel)
         {
             var pessoa = _mapper.Map<PessoaViewModel, Pessoa>(pessoaViewModel);

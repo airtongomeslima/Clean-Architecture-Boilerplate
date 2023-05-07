@@ -11,6 +11,7 @@ namespace WebAPI.Application.Interfaces
     {
         PessoaViewModel[] GetPessoas(int page = 1, int quantity = 25, string orderBy = "Id", string order = "asc");
         PessoaViewModel GetPessoaById(int id);
+        int Count();
         void Add(PessoaViewModel pessoaViewModel);
         void Update(PessoaViewModel pessoaViewModel);
         void Delete(int id);

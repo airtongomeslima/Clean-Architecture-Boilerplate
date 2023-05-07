@@ -12,7 +12,12 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowOrigin", builder => builder.AllowAnyOrigin());
+    options.AddPolicy("AllowOrigin", builder => builder
+        .AllowAnyOrigin()
+        .AllowAnyMethod()
+        .AllowAnyHeader()
+        .WithExposedHeaders("Content-Disposition") // Permite o cabeçalho 'Content-Disposition' para download de arquivos
+        .WithHeaders("Content-Type")); // Permite o cabeçalho 'Content-Type'
 });
 
 DependencyContainer.RegisterServices(builder.Services);

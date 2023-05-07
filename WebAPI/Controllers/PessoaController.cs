@@ -22,6 +22,13 @@ namespace WebAPI.Controllers
             return Ok(pessoas);
         }
 
+        [HttpGet("Count")]
+        public ActionResult<int> Count()
+        {
+            var qtd = _pessoaService.Count();
+            return Ok(qtd);
+        }
+
         [HttpGet("{id}", Name = "GetPessoa")]
         public ActionResult<PessoaViewModel> GetById(int id)
         {
