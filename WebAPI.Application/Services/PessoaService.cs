@@ -54,6 +54,24 @@ namespace WebAPI.Application.Services
                 throw new Exception("Pessoa não encontrada");
             }
 
+            if(pessoaViewModel.IdPessoaResponsavel == pessoaViewModel.Id)
+            {
+                throw new Exception("Pessoa não pode ser responsável por ela mesma");
+            }
+
+            var currentResponsavel = pessoaViewModel.IdPessoaResponsavel;
+            while (currentResponsavel.HasValue && currentResponsavel.Value != 0)
+            {
+                if (currentResponsavel.HasValue)
+                {
+                    currentResponsavel = GetPessoaById(pessoaViewModel.IdPessoaResponsavel.Value).IdPessoaResponsavel;
+                    if (pessoaViewModel.IdPessoaResponsavel == pessoaViewModel.Id)
+                    {
+                        throw new Exception("Pessoa não pode ser responsável por ela mesma na cadeia de comando.");
+                    }
+                }
+            }
+
             pessoaExistente.Nome = pessoaViewModel.Nome;
             pessoaExistente.IdPessoaResponsavel = pessoaViewModel.IdPessoaResponsavel;
             pessoaExistente.SobreNome = pessoaViewModel.SobreNome;

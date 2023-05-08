@@ -150,8 +150,56 @@ namespace WebAPI.Test.MSTest.Services
             Assert.ThrowsException<Exception>(() => _pessoaService.Delete(id));
             _pessoaRepositoryMock.Verify(r => r.Delete(It.IsAny<Pessoa>()), Times.Never);
         }
-    }
 
+        [TestMethod]
+        [ExpectedException(typeof(Exception), "Pessoa não pode ser responsável por ela mesma")]
+        public void Update_WhenPessoaIsResponsavelPorElaMesma_ShouldThrowException()
+        {
+            // Arrange
+            var service = new PessoaService(_pessoaRepositoryMock.Object, _mapper);
+            var pessoaViewModel = new PessoaViewModel { Id = 1, IdPessoaResponsavel = 1 };
+            _pessoaRepositoryMock.Setup(x => x.FindById(pessoaViewModel.Id)).Returns(new Pessoa { Id = 1 });
+
+            // Act
+            service.Update(pessoaViewModel);
+
+            // Assert
+            // Expects exception to be thrown
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(Exception), "Pessoa não encontrada")]
+        public void Update_WhenPessoaIdDoesNotExist_ShouldThrowException()
+        {
+            // Arrange
+            var service = new PessoaService(_pessoaRepositoryMock.Object, _mapper);
+            var pessoaViewModel = new PessoaViewModel { Id = 1 };
+            _pessoaRepositoryMock.Setup(x => x.FindById(pessoaViewModel.Id)).Returns((Pessoa)null);
+
+            // Act
+            service.Update(pessoaViewModel);
+
+            // Assert
+            // Expects exception to be thrown
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(Exception), "Pessoa não encontrada")]
+        public void Update_WhenPessoaViewModelIsNull_ShouldThrowException()
+        {
+            // Arrange
+            var service = new PessoaService(_pessoaRepositoryMock.Object, _mapper);
+            PessoaViewModel pessoaViewModel = null;
+
+            // Act
+            service.Update(pessoaViewModel);
+
+            // Assert
+            // Expects exception to be thrown
+        }
+
+
+    }
 
 
 }

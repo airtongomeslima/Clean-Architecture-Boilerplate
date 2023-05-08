@@ -16,7 +16,6 @@ namespace WebAPI.Application.ViewModels
         public string SobreNome { get; set; }
         public string Sexo { get; set; }
         public int Idade { get; set; }
-        public PessoaViewModel? PessoaResponsavel { get; set; }
         public EnderecoViewModel Endereco { get; set; }
         public List<TelefoneViewModel> Telefones { get; set; }
     }

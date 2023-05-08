@@ -169,7 +169,6 @@ namespace WebAPI.Infra.Data.Repository
                 int idPessoa = item.Id;
                 item.Telefones = _telefoneRepository.FindBy(t => t.IdPessoa == idPessoa).ToList();
                 item.Endereco = _enderecoRepository.FindById(item.IdEndereco);
-                item.PessoaResponsavel = FindById(item.IdPessoaResponsavel);
             }
 
             return result;
@@ -185,7 +184,6 @@ namespace WebAPI.Infra.Data.Repository
                 int idPessoa = item.Id;
                 item.Telefones = _telefoneRepository.FindBy(t => t.IdPessoa == idPessoa).ToList();
                 item.Endereco = _enderecoRepository.FindById(item.IdEndereco);
-                item.PessoaResponsavel = FindById(item.IdPessoaResponsavel);
             }
             return result;
         }
@@ -199,7 +197,6 @@ namespace WebAPI.Infra.Data.Repository
             int idPessoa = result.Id;
             result.Telefones = _telefoneRepository.FindBy(t => t.IdPessoa == idPessoa).ToList();
             result.Endereco = _enderecoRepository.FindById(result.IdEndereco);
-            result.PessoaResponsavel = FindById(result.IdPessoaResponsavel);
             return result;
         }
 

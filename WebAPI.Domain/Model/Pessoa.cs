@@ -10,7 +10,6 @@ namespace WebAPI.Domain.Model
         public string SobreNome { get; set; }
         public string Sexo { get; set; }
         public int Idade { get; set; }
-        public Pessoa? PessoaResponsavel { get; set; }
         public Endereco Endereco { get; set; }
         public List<Telefone> Telefones { get; set; }
     }
