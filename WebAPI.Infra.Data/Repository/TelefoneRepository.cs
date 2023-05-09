@@ -121,7 +121,7 @@ namespace WebAPI.Infra.Data.Repository
 
         public Telefone FindById(int id)
         {
-            return cnn.Query<Telefone>($"SELECT [Id],[IdPessoa],[DDD],[Numero] FROM [Telefone] WHERE Id equals {id};").FirstOrDefault();
+            return cnn.Query<Telefone>($"SELECT [Id],[IdPessoa],[DDD],[Numero] FROM [Telefone] WHERE Id = {id};").FirstOrDefault();
         }
 
         public void Update(Telefone entity)
