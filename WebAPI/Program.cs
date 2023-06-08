@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using WebAPI.Infra.IoC;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,7 +21,8 @@ builder.Services.AddCors(options =>
         .WithHeaders("Content-Type"));
 });
 
-DependencyContainer.RegisterServices(builder.Services);
+
+DependencyContainer.RegisterServices(builder.Services, builder.Configuration);
 
 var app = builder.Build();
 

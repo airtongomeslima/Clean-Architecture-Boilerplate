@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Data.SqlClient;
 using System.Linq.Expressions;
@@ -8,11 +9,16 @@ namespace WebAPI.Infra.Data.Repository
 {
     public class BaseRepository
     {
+        private protected static IConfiguration _configuration;
+
+        public BaseRepository(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+
         public static SqlConnection DbConnection()
         {
-            var cnnString = "Server=192.168.0.207;Database=BaseTeste;User Id=sa;Password=@GL#9941r70n;";
-
-            return new SqlConnection(cnnString);
+            return new SqlConnection(_configuration.GetConnectionString("Base"));
         }
 
         public static string ConvertExpressionToSql(Expression expression)

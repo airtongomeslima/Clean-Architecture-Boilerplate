@@ -7,15 +7,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using static Dapper.SqlMapper;
+using Microsoft.Extensions.Configuration;
 
 namespace WebAPI.Infra.Data.Repository
 {
     public class EnderecoRepository : BaseRepository, IEnderecoRepository
     {
-        readonly SqlConnection cnn = DbConnection();
+        private readonly SqlConnection cnn;
 
-        public EnderecoRepository()
+        public EnderecoRepository(IConfiguration configuration) : base(configuration)
         {
+            cnn = DbConnection();
             cnn.Open();
         }
 

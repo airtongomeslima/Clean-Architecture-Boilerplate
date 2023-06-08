@@ -7,17 +7,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using static Dapper.SqlMapper;
+using Microsoft.Extensions.Configuration;
 
 namespace WebAPI.Infra.Data.Repository
 {
     public class PessoaRepository : BaseRepository, IPessoaRepository
     {
-        readonly SqlConnection cnn = DbConnection();
+        private readonly SqlConnection cnn;
         private readonly IEnderecoRepository _enderecoRepository;
         private readonly ITelefoneRepository _telefoneRepository;
 
-        public PessoaRepository(IEnderecoRepository enderecoRepository, ITelefoneRepository telefoneRepository)
+        public PessoaRepository(IEnderecoRepository enderecoRepository, ITelefoneRepository telefoneRepository, IConfiguration configuration) : base(configuration)
         {
+            cnn = DbConnection();
             cnn.Open();
             _enderecoRepository = enderecoRepository;
             _telefoneRepository = telefoneRepository;

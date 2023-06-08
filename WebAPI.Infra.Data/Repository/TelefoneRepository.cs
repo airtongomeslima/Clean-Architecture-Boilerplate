@@ -6,15 +6,17 @@ using System.Linq.Expressions;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using Microsoft.Extensions.Configuration;
 
 namespace WebAPI.Infra.Data.Repository
 {
     public class TelefoneRepository : BaseRepository, ITelefoneRepository
     {
-        readonly SqlConnection cnn = DbConnection();
+        private readonly SqlConnection cnn;
 
-        public TelefoneRepository()
+        public TelefoneRepository(IConfiguration configuration) : base(configuration)
         {
+            cnn = DbConnection();
             cnn.Open();
         }
 
